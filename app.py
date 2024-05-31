@@ -15,6 +15,7 @@ try:
     base_uri = os.environ["HE_URI"]
     access_token = os.environ["HE_TOKEN"]
     collected_metrics = os.getenv("HE_METRICS", "battery,humidity,illuminance,level,switch,temperature,power,energy").split(",")
+    metric_prefix = os.environ.get("HE_METRIC_PREFIX", "hubitat")
 except KeyError as e:
     print(f"Could not read the environment variable - {e}")
 
@@ -89,9 +90,9 @@ def metrics():
                             "device_human_label": f"{device_human_label}",
                             "device_type": f"{device_type}",
                             "device_id": f"{device_id}",
-                            "metric_name": f"{metric_name}",
+                            "metric_name": f"{metric_prefix}_{metric_name}",
                             "metric_value": f"{value}",
-                            "metric_timestamp": time.time()})
+                        })
         # Create the response
         response = make_response(render_template('base.txt',
              device_details=device_attributes
