@@ -9,13 +9,33 @@ from fastapi.responses import PlainTextResponse
 
 app = FastAPI()
 
+useful_metrics = [
+    "battery",
+    "humidity",
+    "illuminance",
+    "level",
+    "switch",
+    "temperature",
+    "power",
+    "energy",
+    "smoke",
+    "carbonMonoxide",
+    "batteryVoltage",
+    "water",
+    "presence",
+    "contact",
+    "pressure",
+    "rate",
+    "thermostatSetpoint",
+]
+
 # Load the configuration values from environment variables - HE_URI and HE_TOKEN
 # are mandatory, however a default collection of metrics is provided if the
 # HE_METRICS env is missing.
 try:
     base_uri = os.environ["HE_URI"]
     access_token = os.environ["HE_TOKEN"]
-    collected_metrics = os.getenv("HE_METRICS", "battery,humidity,illuminance,level,switch,temperature,power,energy").split(",")
+    collected_metrics = os.getenv("HE_METRICS").split(",") if os.getenv("HE_METRICS") else useful_metrics
     metric_prefix = os.environ.get("HE_METRIC_PREFIX", "hubitat")
 except KeyError as e:
     print(f"Could not read the environment variable - {e}")
@@ -70,6 +90,26 @@ def metrics():
                                 value = 1
                             elif value == "off":
                                 value = 0
+                        if attrib == "contact":
+                            match value:
+                                case "open":
+                                    value = 1
+                                case "closed":
+                                    value = 0
+                        if attrib == "smoke" or attrib == "carbonMonoxide":
+                            match value:
+                                case "clear":
+                                    value = 0
+                                case "detected":
+                                    value = 1
+                                case "tested":
+                                    value = -1
+                        if attrib == "presence":
+                            match value:
+                                case "present":
+                                    value = 1
+                                case "not present":
+                                    value = 0
     
                         # Sanitize to allow Prometheus Ingestion
                         device_name = device['name']
