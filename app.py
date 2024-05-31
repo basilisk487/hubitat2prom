@@ -4,9 +4,9 @@ import requests
 import time
 import re
 
-from flask import render_template, Flask, make_response, Response
+from fastapi import FastAPI
 
-app = Flask(__name__)
+app = FastAPI()
 
 # Load the configuration values from environment variables - HE_URI and HE_TOKEN
 # are mandatory, however a default collection of metrics is provided if the
