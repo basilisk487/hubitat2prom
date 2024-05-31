@@ -72,10 +72,9 @@ def metrics():
                                 value = 0
     
                         # Sanitize to allow Prometheus Ingestion
-                        device_name = sanitize(device['name'])
-                        device_label = sanitize(device['label'])
+                        device_name = device['name']
                         device_human_label = device['label']
-                        device_type = sanitize(device['type'])
+                        device_type = device['type']
                         device_id = sanitize(device['id'])
                         metric_name = sanitize(attrib)
                         # Create the dict that holds the data
