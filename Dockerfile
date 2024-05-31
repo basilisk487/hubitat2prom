@@ -17,7 +17,7 @@ COPY templates /app/templates
 
 WORKDIR /app
 
-RUN /usr/bin/python3 -m pip install -r requirements.txt
+RUN pip install -r requirements.txt
 
 EXPOSE 5000
 
