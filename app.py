@@ -5,6 +5,7 @@ import time
 import re
 
 from fastapi import FastAPI
+from fastapi.responses import PlainTextResponse
 
 app = FastAPI()
 
@@ -20,15 +21,15 @@ except KeyError as e:
     print(f"Could not read the environment variable - {e}")
 
 def get_all_devices():
-    return requests.get(f"{base_uri}/all?access_token={access_token}")
+    return requests.get(f"{base_uri}/all?access_token={access_token}", timeout=30)
 
 def get_devices():
-    return requests.get(f"{base_uri}?access_token={access_token}")
+    return requests.get(f"{base_uri}?access_token={access_token}", timeout=30)
 
 @app.get("/info")
 def info():
     result = get_devices()
-    res = {
+    return {
         "status": {
             "CONNECTION": "ONLINE" if result.status_code == 200 else "OFFLINE",
             "CODE": result.status_code
@@ -39,14 +40,8 @@ def info():
             "HE_METRICS": collected_metrics
         }
     }
-    response = app.response_class(
-        response=json.dumps(res),
-        status=200,
-        mimetype='application/json'
-    )
-    return response
 
-@app.get("/metrics")
+@app.get("/metrics", response_class=PlainTextResponse)
 def metrics():
     devices = get_all_devices()
     if devices.status_code == 200:
@@ -84,21 +79,11 @@ def metrics():
                         device_id = sanitize(device['id'])
                         metric_name = sanitize(attrib)
                         # Create the dict that holds the data
-                        device_attributes.append({
-                            "device_name": f"{device_name}",
-                            "device_label": f"{device_label}",
-                            "device_human_label": f"{device_human_label}",
-                            "device_type": f"{device_type}",
-                            "device_id": f"{device_id}",
-                            "metric_name": f"{metric_prefix}_{metric_name}",
-                            "metric_value": f"{value}",
-                        })
+                        device_attributes.append(
+                            f"{metric_prefix}_{metric_name} name=\"{device_name}\",label=\"{device_human_label}\",type=\"{device_type}\",id=\"{device_id}\" {value}"
+                        )
         # Create the response
-        response = make_response(render_template('base.txt',
-             device_details=device_attributes
-                ))
-        # Make sure we return plain text otherwise Prometheus complains
-        response.mimetype = "text/plain"
+        response = "\n".join(device_attributes)
     else:
         response = devices
     return response
