@@ -25,7 +25,7 @@ def get_all_devices():
 def get_devices():
     return requests.get(f"{base_uri}?access_token={access_token}")
 
-@app.route("/info")
+@app.get("/info")
 def info():
     result = get_devices()
     res = {
@@ -46,7 +46,7 @@ def info():
     )
     return response
 
-@app.route("/metrics")
+@app.get("/metrics")
 def metrics():
     devices = get_all_devices()
     if devices.status_code == 200:
