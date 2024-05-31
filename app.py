@@ -119,7 +119,7 @@ def metrics():
                         metric_name = sanitize(attrib)
                         # Create the dict that holds the data
                         device_attributes.append(
-                            f"{metric_prefix}_{metric_name} name=\"{device_name}\",label=\"{device_human_label}\",type=\"{device_type}\",id=\"{device_id}\" {value}"
+                            f"{metric_prefix}_{metric_name}{{name=\"{device_name}\",label=\"{device_human_label}\",type=\"{device_type}\",id=\"{device_id}\"}} {value}"
                         )
         # Create the response
         response = "\n".join(device_attributes)
