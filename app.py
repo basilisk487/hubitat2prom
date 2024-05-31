@@ -65,7 +65,7 @@ def info():
 def metrics():
     devices = get_all_devices()
     if devices.status_code == 200:
-        device_attributes = []
+        lines = []
 
         for device in devices.json():
             for attrib in device['attributes']:
@@ -111,18 +111,25 @@ def metrics():
                                 case "not present":
                                     value = 0
     
-                        # Sanitize to allow Prometheus Ingestion
-                        device_name = device['name']
-                        device_human_label = device['label']
-                        device_type = device['type']
-                        device_id = sanitize(device['id'])
-                        metric_name = sanitize(attrib)
-                        # Create the dict that holds the data
-                        device_attributes.append(
-                            f"{metric_prefix}_{metric_name}{{name=\"{device_name}\",label=\"{device_human_label}\",type=\"{device_type}\",id=\"{device_id}\"}} {value}"
-                        )
+                        tags = [
+                            f"name=\"{device['name']}\"",
+                            f"label=\"{device['label']}\"",
+                            f"type=\"{device['type']}\"",
+                            f"id=\"{sanitize(device['id'])}\""
+                        ]
+                        metric_name = f"{metric_prefix}_{sanitize(attrib)}"
+                        if attrib == "temperature":  # report temperature twice
+                            unit_f = f"unit=\"F\""
+                            lines.append(f"{metric_name}{{{','.join(tags + [unit_f])}}} {value}")
+                            value_c = (float(value) - 32) / 1.8
+                            unit_c = f"unit=\"C\""
+                            lines.append(f"{metric_name}{{{','.join(tags + [unit_c])}}} {value_c}")
+                        else:
+                            lines.append(f"{metric_name}{{{','.join(tags)}}} {value}")
+
+
         # Create the response
-        response = "\n".join(device_attributes)
+        response = "\n".join(lines)
     else:
         response = devices
     return response
