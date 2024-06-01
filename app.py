@@ -117,6 +117,8 @@ def metrics():
                             f"type=\"{device['type']}\"",
                             f"id=\"{sanitize(device['id'])}\""
                         ]
+                        if device.get("room"):
+                            tags.append(f"room=\"{device['room']}\"")
                         metric_name = f"{metric_prefix}_{sanitize(attrib)}"
                         if attrib == "temperature":  # report temperature twice
                             unit_f = f"unit=\"F\""
