@@ -22,6 +22,7 @@ useful_metrics = [
     "carbonMonoxide",
     "batteryVoltage",
     "water",
+    "motion",
     "presence",
     "contact",
     "pressure",
@@ -110,7 +111,13 @@ def metrics():
                                     value = 1
                                 case "not present":
                                     value = 0
-    
+                        if attrib == "motion":
+                            match value:
+                                case "active":
+                                    value = 1
+                                case "inactive":
+                                    value = 0
+
                         tags = [
                             f"name=\"{device['name']}\"",
                             f"label=\"{device['label']}\"",
