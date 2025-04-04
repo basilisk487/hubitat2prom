@@ -28,6 +28,15 @@ useful_metrics = [
     "pressure",
     "rate",
     "thermostatSetpoint",
+    # Hub Information metrics
+    "cpu15Min",
+    "cpu15Pct",
+    "cpu5Min",
+    "cpuPct",
+    "dbSize",
+    "freeMem15",
+    "freeMemory",
+    "uptime",
 ]
 
 # Load the configuration values from environment variables - HE_URI and HE_TOKEN
