@@ -36,6 +36,8 @@ useful_metrics = [
     "dbSize",
     "freeMem15",
     "freeMemory",
+    "jvmFree",
+    "jvmSize",
     "uptime",
 ]
 
